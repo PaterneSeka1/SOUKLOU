@@ -6,7 +6,7 @@ import {
   DocumentTextIcon,
   DevicePhoneMobileIcon,
   PaperAirplaneIcon,
-  CogIcon,
+  UserIcon, // icône profil
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
@@ -50,12 +50,14 @@ export function Sidebar() {
         { label: "Envoi de message", icon: PaperAirplaneIcon, to: "/admin/send-message" },
       ],
     },
-    { title: "Paramètre", links: [{ label: "Setting", icon: CogIcon, to: "/admin/settings" }] },
+    { title: "Compte", links: [{ label: "Profil", icon: UserIcon, to: "/admin/settings" }] },
   ]
 
   // Animation slide mobile
   const [menuHeight, setMenuHeight] = useState(0)
-  useEffect(() => { if (menuRef.current) setMenuHeight(menuRef.current.scrollHeight) }, [isOpen])
+  useEffect(() => {
+    if (menuRef.current) setMenuHeight(menuRef.current.scrollHeight)
+  }, [isOpen])
 
   const handleSelectOrg = (orgId: string) => {
     console.log("Organisation sélectionnée :", orgId)
@@ -68,10 +70,7 @@ export function Sidebar() {
   // 🔹 Fermeture automatique si clic à l'extérieur
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOrgDropdownOpen(false)
       }
     }
@@ -79,63 +78,62 @@ export function Sidebar() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [orgDropdownOpen])
 
-const OrgButton = ({ mobile = false }: { mobile?: boolean }) => (
-  <div className={`px-4 py-4 border-t relative`}>
-    {hasMultipleOrgs ? (
-      <>
-        <button
-          onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
-          className="flex items-center justify-between w-full px-4 py-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 font-medium transition"
+  const OrgButton = ({ mobile = false }: { mobile?: boolean }) => (
+    <div className={`px-4 py-4 border-t relative`}>
+      {hasMultipleOrgs ? (
+        <>
+          <button
+            onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
+            className="flex items-center justify-between w-full px-4 py-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 font-medium transition"
+          >
+            <span>Changer d'organisation</span>
+            <ChevronDownIcon
+              className={`w-5 h-5 transition-transform ${orgDropdownOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {orgDropdownOpen && (
+            <>
+              {/* Overlay */}
+              <div className="fixed inset-0 bg-black bg-opacity-20 z-40" />
+
+              {/* Panel dropdown au-dessus du bouton */}
+              <div
+                ref={dropdownRef}
+                className="absolute left-0 bottom-full mb-2 w-64 max-h-80 overflow-y-auto bg-white border rounded shadow-lg z-50"
+              >
+                {user.organizations.map((org) => (
+                  <button
+                    key={org.id}
+                    onClick={() => handleSelectOrg(org.id)}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+                  >
+                    {org.name}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      ) : (
+        <Link
+          to="/admin/organizations/add"
+          className="flex items-center gap-2 w-full px-4 py-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 font-medium transition"
         >
-          <span>Changer d'organisation</span>
-          <ChevronDownIcon
-            className={`w-5 h-5 transition-transform ${
-              orgDropdownOpen ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-
-        {orgDropdownOpen && (
-          <>
-            {/* Overlay */}
-            <div className="fixed inset-0 bg-black bg-opacity-20 z-40" />
-
-            {/* Panel dropdown au-dessus du bouton */}
-            <div
-              ref={dropdownRef}
-              className="absolute left-0 bottom-full mb-2 w-64 max-h-80 overflow-y-auto bg-white border rounded shadow-lg z-50"
-            >
-              {user.organizations.map((org) => (
-                <button
-                  key={org.id}
-                  onClick={() => handleSelectOrg(org.id)}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition"
-                >
-                  {org.name}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-      </>
-    ) : (
-      <Link
-        to="/admin/organizations/add"
-        className="flex items-center gap-2 w-full px-4 py-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 font-medium transition"
-      >
-        <PlusIcon className="w-5 h-5" />
-        Ajouter une organisation
-      </Link>
-    )}
-  </div>
-)
-
+          <PlusIcon className="w-5 h-5" />
+          Ajouter une organisation
+        </Link>
+      )}
+    </div>
+  )
 
   return (
     <>
       {/* Navbar mobile */}
       <header className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b shadow z-50 flex items-center justify-between px-4 py-3">
-        <div className="text-[#2061D9] font-bold text-xl">SOUKLOU</div>
+        <div className="text-[#2061D9] font-bold text-xl">
+          <img src="/logo2.png" alt="Logo" className="h-8" />
+        </div>
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="p-2 bg-[#2061D9] text-white rounded-lg"
@@ -145,7 +143,12 @@ const OrgButton = ({ mobile = false }: { mobile?: boolean }) => (
       </header>
 
       {/* Overlay mobile */}
-      {isOpen && <div className="lg:hidden fixed inset-0 bg-black bg-opacity-30 z-30" onClick={() => setIsOpen(false)} />}
+      {isOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-30 z-30"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
 
       {/* Menu mobile */}
       <div
@@ -193,7 +196,7 @@ const OrgButton = ({ mobile = false }: { mobile?: boolean }) => (
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex lg:flex-col w-64 bg-white border-r shadow-lg h-screen sticky top-0">
         <div className="px-6 py-4 border-b">
-          <div className="text-[#2061D9] font-bold text-xl">SOUKLOU</div>
+          <img src="/logo2.png" alt="Logo" className="h-10" />
         </div>
 
         <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-6">
