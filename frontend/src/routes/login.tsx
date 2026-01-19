@@ -22,7 +22,8 @@ function LoginPage() {
       {/* LEFT SIDE */}
       <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#2061D9] to-[#2061D9] items-center justify-center">
         <div className="text-center text-white space-y-6">
-          <div className="text-4xl font-bold">SOUKLOU</div>
+          <img src="/logo1.png" alt="Logo" className="mx-auto h-20 w-auto" />
+          {/* <div className="text-4xl font-bold">SOUKLOU</div> */}
           <h1 className="text-4xl font-extrabold">
             Votre plateforme de
             <br />
@@ -38,12 +39,15 @@ function LoginPage() {
             e.preventDefault()
             form.handleSubmit()
           }}
-          className="w-full max-w-md space-y-6 px-8"
+          className="w-full max-w-md space-y-6 px-8 py-12"
         >
+          {/* Logo top for mobile */}
+          <div className="lg:hidden text-center mb-6">
+            <img src="/logo1.png" alt="Logo" className="mx-auto h-16 w-auto" />
+          </div>
+
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Connexion
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900">Connexion</h2>
             <p className="text-gray-500 text-sm">
               Connectez-vous pour accéder à votre espace
             </p>
@@ -53,17 +57,13 @@ function LoginPage() {
           <form.Field name="email">
             {(field) => (
               <div className="space-y-1">
-                <label className="text-sm font-medium">
-                  Adresse email
-                </label>
+                <label className="text-sm font-medium">Adresse email</label>
                 <input
                   type="email"
                   placeholder="exemple@email.com"
                   value={field.state.value}
-                  onChange={(e) =>
-                    field.handleChange(e.target.value)
-                  }
-                  className="w-full px-4 py-3 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2061D9]"
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2061D9] focus:border-[#2061D9] transition"
                 />
               </div>
             )}
@@ -73,17 +73,13 @@ function LoginPage() {
           <form.Field name="password">
             {(field) => (
               <div className="space-y-1">
-                <label className="text-sm font-medium">
-                  Mot de passe
-                </label>
+                <label className="text-sm font-medium">Mot de passe</label>
                 <input
                   type="password"
                   placeholder="Votre mot de passe"
                   value={field.state.value}
-                  onChange={(e) =>
-                    field.handleChange(e.target.value)
-                  }
-                  className="w-full px-4 py-3 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2061D9]"
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2061D9] focus:border-[#2061D9] transition"
                 />
               </div>
             )}

@@ -20,12 +20,12 @@ function DashboardPage() {
   return (
     <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64">
+      <aside className="lg:w-64">
         <Sidebar />
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="flex-1 p-8 overflow-auto pt-20 lg:pt-8">
         {/* Header */}
         <h1 className="text-3xl font-bold mb-6">Bienvenue, Dirigeant</h1>
 

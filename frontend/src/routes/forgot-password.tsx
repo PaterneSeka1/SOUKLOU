@@ -22,6 +22,7 @@ function ForgotPasswordPage() {
       {/* LEFT SIDE */}
       <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#2061D9] to-[#174bb0] items-center justify-center">
         <div className="text-center text-white space-y-6">
+          <img src="/logo1.png" alt="Logo" className="mx-auto h-20 w-auto" />
           <div className="text-4xl font-bold">SOUKLOU</div>
           <h1 className="text-4xl font-extrabold">
             Réinitialisez votre
@@ -38,8 +39,13 @@ function ForgotPasswordPage() {
             e.preventDefault()
             form.handleSubmit()
           }}
-          className="w-full max-w-md space-y-5 px-8"
+          className="w-full max-w-md space-y-5 px-8 py-12"
         >
+          {/* Logo top for mobile */}
+          <div className="lg:hidden text-center mb-6">
+            <img src="/logo1.png" alt="Logo" className="mx-auto h-16 w-auto" />
+          </div>
+
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
               Mot de passe oublié
@@ -53,17 +59,13 @@ function ForgotPasswordPage() {
           <form.Field name="email">
             {(field) => (
               <div className="space-y-1">
-                <label className="text-sm font-medium">
-                  Adresse email
-                </label>
+                <label className="text-sm font-medium">Adresse email</label>
                 <input
                   type="email"
                   placeholder="exemple@email.com"
                   value={field.state.value}
-                  onChange={(e) =>
-                    field.handleChange(e.target.value)
-                  }
-                  className="w-full px-4 py-3 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2061D9]"
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2061D9] focus:border-[#2061D9] transition"
                 />
               </div>
             )}
