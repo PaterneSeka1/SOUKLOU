@@ -25,7 +25,7 @@ function RegisterPage() {
       <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#2061D9] to-[#2061D9] items-center justify-center">
         <div className="text-center text-white space-y-6">
           <img src="/logo1.png" alt="Logo" className="mx-auto h-20 w-auto" />
-          <div className="text-4xl font-bold">SOUKLOU</div>
+          {/* <div className="text-4xl font-bold">SOUKLOU</div> */}
           <h1 className="text-4xl font-extrabold">
             Votre plateforme de
             <br />

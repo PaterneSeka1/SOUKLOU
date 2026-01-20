@@ -2,11 +2,12 @@ import { useState, useRef, useEffect } from "react"
 import { Link, useRouterState } from "@tanstack/react-router"
 import {
   HomeIcon,
-  UserGroupIcon,
-  DocumentTextIcon,
-  DevicePhoneMobileIcon,
-  PaperAirplaneIcon,
-  UserIcon, // icône profil
+  BuildingLibraryIcon,
+  AcademicCapIcon,
+  ArrowUpTrayIcon,
+  CreditCardIcon,
+  UserPlusIcon,
+  UserIcon,
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
@@ -20,221 +21,314 @@ export function Sidebar() {
   const menuRef = useRef<HTMLDivElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Simulons l’utilisateur avec ses organisations
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  })
+
+  // 🔹 Fake user/orgs (à remplacer par ton store plus tard)
   const user = {
     organizations: [
       { id: "1", name: "Groupe Scolaire ABC" },
-      { id: "2", name: "Groupe Scolaire XYZ" },
-      { id: "3", name: "École Primaire 123" },
-      { id: "4", name: "Lycée DEF" },
-      { id: "5", name: "Collège LMN" },
-      { id: "6", name: "École GHI" },
+      { id: "2", name: "Lycée Moderne XYZ" },
+      { id: "3", name: "Collège Privé DEF" },
     ],
   }
 
-  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const hasMultipleOrgs = user.organizations.length > 1
 
+  // 🔹 Sections alignées avec Actions rapides
   const sections = [
-    { title: "Tableau de bord", links: [{ label: "Dashboard", icon: HomeIcon, to: "/admin/dashboard" }] },
     {
-      title: "Données",
+      title: "Tableau de bord",
+      links: [{ label: "Dashboard", icon: HomeIcon, to: "/admin/dashboard" }],
+    },
+    {
+      title: "Gestion scolaire",
       links: [
-        { label: "Contacts", icon: UserGroupIcon, to: "/admin/contacts" },
-        { label: "Templates", icon: DocumentTextIcon, to: "/admin/templates" },
+        {
+          label: "Écoles",
+          icon: BuildingLibraryIcon,
+          to: "/admin/schools",
+        },
+        {
+          label: "Niveaux",
+          icon: AcademicCapIcon,
+          to: "/admin/grades",
+        },
+        {
+          label: "Étudiants",
+          icon: ArrowUpTrayIcon,
+          to: "/admin/students",
+        },
       ],
     },
     {
-      title: "SMS",
+      title: "Administration",
       links: [
-        { label: "Noms d'expéditeurs", icon: DevicePhoneMobileIcon, to: "/admin/senders" },
-        { label: "Envoi de message", icon: PaperAirplaneIcon, to: "/admin/send-message" },
+        {
+          label: "Plans de paiement",
+          icon: CreditCardIcon,
+          to: "/admin/payments/plans",
+        },
+        {
+          label: "Membres de l'équipe",
+          icon: UserPlusIcon,
+          to: "/admin/teams",
+        },
       ],
     },
-    { title: "Compte", links: [{ label: "Profil", icon: UserIcon, to: "/admin/settings" }] },
+    {
+      title: "Compte",
+      links: [{ label: "Profil", icon: UserIcon, to: "/admin/profil" }],
+    },
   ]
 
-  // Animation slide mobile
+  // 🔹 Animation mobile
   const [menuHeight, setMenuHeight] = useState(0)
   useEffect(() => {
     if (menuRef.current) setMenuHeight(menuRef.current.scrollHeight)
   }, [isOpen])
 
-  const handleSelectOrg = (orgId: string) => {
-    console.log("Organisation sélectionnée :", orgId)
+  // 🔹 Fermer dropdown org au clic extérieur
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOrgDropdownOpen(false)
+      }
+    }
+    if (orgDropdownOpen) document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [orgDropdownOpen])
+
+  const handleSelectOrg = (id: string) => {
+    console.log("Organisation sélectionnée :", id)
     setOrgDropdownOpen(false)
     setIsOpen(false)
   }
 
-  const hasMultipleOrgs = user.organizations.length > 1
-
-  // 🔹 Fermeture automatique si clic à l'extérieur
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setOrgDropdownOpen(false)
-      }
-    }
-    if (orgDropdownOpen) document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [orgDropdownOpen])
-
-  const OrgButton = ({ mobile = false }: { mobile?: boolean }) => (
-    <div className={`px-4 py-4 border-t relative`}>
+  const OrgButton = () => (
+    <div className="relative" ref={dropdownRef}>
       {hasMultipleOrgs ? (
         <>
           <button
             onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
-            className="flex items-center justify-between w-full px-4 py-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 font-medium transition"
+            className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl bg-white/10 text-white hover:bg-white/20 font-semibold transition-all duration-300 hover:scale-[1.01] border border-white/20 shadow-sm backdrop-blur-sm"
           >
-            <span>Changer d'organisation</span>
-            <ChevronDownIcon
-              className={`w-5 h-5 transition-transform ${orgDropdownOpen ? "rotate-180" : ""}`}
-            />
-          </button>
-
-          {orgDropdownOpen && (
-            <>
-              {/* Overlay */}
-              <div className="fixed inset-0 bg-black bg-opacity-20 z-40" />
-
-              {/* Panel dropdown au-dessus du bouton */}
-              <div
-                ref={dropdownRef}
-                className="absolute left-0 bottom-full mb-2 w-64 max-h-80 overflow-y-auto bg-white border rounded shadow-lg z-50"
-              >
-                {user.organizations.map((org) => (
-                  <button
-                    key={org.id}
-                    onClick={() => handleSelectOrg(org.id)}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 transition"
-                  >
-                    {org.name}
-                  </button>
-                ))}
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+                <BuildingLibraryIcon className="w-4 h-4" />
               </div>
-            </>
+              <span className="text-xs">Organisations</span>
+            </div>
+            <ChevronDownIcon className={`w-4 h-4 transition-transform duration-300 ${orgDropdownOpen ? "rotate-180" : ""}`} />
+          </button>
+          {orgDropdownOpen && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+              {user.organizations.map((org, index) => (
+                <button
+                  key={org.id}
+                  onClick={() => handleSelectOrg(org.id)}
+                  className={`w-full text-left px-3 py-2.5 hover:bg-gray-50 transition-all duration-200 text-xs font-medium text-gray-700 hover:text-[#2061D9] ${
+                    index !== user.organizations.length - 1 ? "border-b border-gray-100" : ""
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#2061D9]"></div>
+                    {org.name}
+                  </div>
+                </button>
+              ))}
+            </div>
           )}
         </>
       ) : (
-        <Link
-          to="/admin/organizations/add"
-          className="flex items-center gap-2 w-full px-4 py-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 font-medium transition"
-        >
-          <PlusIcon className="w-5 h-5" />
-          Ajouter une organisation
-        </Link>
+        <button className="flex items-center justify-center gap-2 w-full px-3 py-2.5 rounded-xl bg-white/10 text-white hover:bg-white/20 font-semibold transition-all duration-300 hover:scale-[1.01] border border-white/20 shadow-sm backdrop-blur-sm">
+          <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+            <PlusIcon className="w-4 h-4" />
+          </div>
+          <span className="text-xs">Ajouter organisation</span>
+        </button>
       )}
     </div>
   )
 
   return (
     <>
-      {/* Navbar mobile */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b shadow z-50 flex items-center justify-between px-4 py-3">
-        <div className="text-[#2061D9] font-bold text-xl">
-          <img src="/logo2.png" alt="Logo" className="h-8" />
+      {/* 🔹 NAVBAR MOBILE */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white shadow-lg px-6 py-5 flex items-center justify-between border-b-2 border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-[#2061D9] flex items-center justify-center shadow-lg">
+            <BuildingLibraryIcon className="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-gray-900 tracking-tight">EduPanel</div>
+            <div className="text-xs text-gray-500 font-medium">Gestion scolaire</div>
+          </div>
         </div>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 bg-[#2061D9] text-white rounded-lg"
+          className="p-3 rounded-2xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200 border-2 border-gray-200 hover:scale-110"
         >
           {isOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
         </button>
-      </header>
+      </div>
 
-      {/* Overlay mobile */}
+      {/* 🔹 OVERLAY MOBILE */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-30 z-30"
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300"
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Menu mobile */}
+      {/* 🔹 MENU MOBILE */}
       <div
-        className="lg:hidden fixed top-16 left-0 right-0 overflow-hidden transition-all duration-300 ease-in-out z-40"
-        style={{ maxHeight: isOpen ? `${menuHeight}px` : "0px" }}
+        ref={menuRef}
+        style={{
+          maxHeight: isOpen ? `${menuHeight}px` : "0px",
+        }}
+        className="lg:hidden fixed top-[88px] left-0 right-0 z-40 bg-white overflow-hidden transition-all duration-300 ease-out shadow-2xl border-b-2 border-gray-200"
       >
-        <div ref={menuRef} className="bg-white border-b shadow">
+        <div className="p-6 space-y-6">
+          <OrgButton />
+
           {sections.map((section) => (
-            <div key={section.title} className="py-2 border-t first:border-t-0">
-              <p className="text-gray-400 uppercase text-xs font-semibold px-4 mb-1">{section.title}</p>
-              {section.links.map((link) => {
-                const isActive = pathname.startsWith(link.to)
-                return (
-                  <Link
-                    key={link.label}
-                    to={link.to}
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition
-                      ${isActive ? "bg-[#2061D9]/10 text-[#2061D9] font-semibold" : "text-gray-700 hover:bg-gray-100 hover:text-[#2061D9]"}`}
-                  >
-                    <link.icon className="w-5 h-5" />
-                    {link.label}
-                  </Link>
-                )
-              })}
+            <div key={section.title} className="space-y-3">
+              <div className="flex items-center gap-2 px-2">
+                <div className="h-1 w-1 rounded-full bg-[#2061D9]"></div>
+                <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                  {section.title}
+                </div>
+              </div>
+              <div className="space-y-2">
+                {section.links.map((link) => {
+                  const isActive = pathname.startsWith(link.to)
+                  return (
+                    <Link
+                      key={link.to}
+                      to={link.to}
+                      onClick={() => setIsOpen(false)}
+                      className={`group flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 ${
+                        isActive
+                          ? "bg-[#2061D9] text-white shadow-xl shadow-[#2061D9]/30 scale-[1.01]"
+                          : "text-gray-700 hover:bg-gray-50 hover:scale-[1.01] border-2 border-transparent hover:border-gray-200"
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                        isActive 
+                          ? "bg-white/20 backdrop-blur-sm" 
+                          : "bg-gray-100 group-hover:bg-gray-200"
+                      }`}>
+                        <link.icon className={`w-6 h-6 transition-transform duration-300 ${isActive ? "" : "group-hover:scale-110"}`} />
+                      </div>
+                      <span className="font-semibold">{link.label}</span>
+                      {isActive && (
+                        <div className="ml-auto w-2 h-2 rounded-full bg-white"></div>
+                      )}
+                    </Link>
+                  )
+                })}
+              </div>
             </div>
           ))}
 
-          {/* Organisation mobile */}
-          <OrgButton mobile />
-
-          {/* Déconnexion */}
-          <div className="px-4 py-4 border-t">
-            <button
-              onClick={() => console.log("Déconnexion")}
-              className="flex items-center gap-2 w-full px-4 py-2 rounded-lg hover:bg-red-50 transition text-red-600 font-medium"
-            >
-              <ArrowRightOnRectangleIcon className="w-5 h-5" />
-              Déconnexion
-            </button>
-          </div>
+          <button className="flex items-center gap-4 px-5 py-4 rounded-2xl text-red-600 hover:bg-red-50 transition-all duration-300 w-full font-semibold border-2 border-transparent hover:border-red-200 hover:shadow-lg hover:shadow-red-500/10">
+            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+              <ArrowRightOnRectangleIcon className="w-6 h-6" />
+            </div>
+            Déconnexion
+          </button>
         </div>
       </div>
 
-      {/* Sidebar desktop */}
-      <aside className="hidden lg:flex lg:flex-col w-64 bg-white border-r shadow-lg h-screen sticky top-0">
-        <div className="px-6 py-4 border-b">
-          <img src="/logo2.png" alt="Logo" className="h-10" />
+      {/* 🔹 SIDEBAR DESKTOP */}
+      <aside className="hidden lg:flex lg:flex-col fixed left-0 top-0 h-screen w-64 bg-[#2061D9] shadow-2xl z-30">
+        {/* Header */}
+        <div className="p-5 border-b-2 border-white/10">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm shadow-lg flex items-center justify-center border-2 border-white/20">
+              <BuildingLibraryIcon className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <div className="text-lg font-bold text-white tracking-tight">
+                EduPanel
+              </div>
+              <div className="text-[10px] text-white/70 font-semibold">Gestion scolaire</div>
+            </div>
+          </div>
+          <OrgButton />
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-6">
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
           {sections.map((section) => (
-            <div key={section.title}>
-              <p className="text-gray-400 uppercase text-xs font-semibold px-2 mb-2">{section.title}</p>
-              {section.links.map((link) => {
-                const isActive = pathname.startsWith(link.to)
-                return (
-                  <Link
-                    key={link.label}
-                    to={link.to}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition
-                      ${isActive ? "bg-[#2061D9]/10 text-[#2061D9] font-semibold" : "text-gray-700 hover:bg-gray-100 hover:text-[#2061D9]"}`}
-                  >
-                    <link.icon className="w-5 h-5" />
-                    {link.label}
-                  </Link>
-                )
-              })}
+            <div key={section.title} className="space-y-1.5">
+              <div className="flex items-center gap-2 px-2 mb-2">
+                <div className="h-1 w-1 rounded-full bg-white/50"></div>
+                <div className="text-[10px] font-bold text-white/60 uppercase tracking-widest">
+                  {section.title}
+                </div>
+              </div>
+              <div className="space-y-1">
+                {section.links.map((link) => {
+                  const isActive = pathname.startsWith(link.to)
+                  return (
+                    <Link
+                      key={link.to}
+                      to={link.to}
+                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 ${
+                        isActive
+                          ? "bg-white text-[#2061D9] shadow-lg scale-[1.01]"
+                          : "text-white/90 hover:bg-white/10 hover:scale-[1.01]"
+                      }`}
+                    >
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        isActive 
+                          ? "bg-[#2061D9]/10" 
+                          : "bg-white/10 group-hover:bg-white/20"
+                      }`}>
+                        <link.icon className={`w-5 h-5 transition-transform duration-300 ${isActive ? "" : "group-hover:scale-110"}`} />
+                      </div>
+                      <span className="font-semibold text-sm flex-1">{link.label}</span>
+                      {isActive && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#2061D9] animate-pulse"></div>
+                      )}
+                    </Link>
+                  )
+                })}
+              </div>
             </div>
           ))}
         </nav>
 
-        {/* Organisation desktop */}
-        <OrgButton />
-
-        {/* Déconnexion */}
-        <div className="px-4 py-4 border-t">
-          <button
-            onClick={() => console.log("Déconnexion")}
-            className="flex items-center gap-2 w-full px-4 py-2 rounded-lg hover:bg-red-50 transition text-red-600 font-medium"
-          >
-            <ArrowRightOnRectangleIcon className="w-5 h-5" />
-            Déconnexion
+        {/* Footer */}
+        <div className="p-4 border-t-2 border-white/10">
+          <button className="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-white hover:bg-white/10 transition-all duration-300 w-full font-semibold hover:scale-[1.01]">
+            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center group-hover:bg-white/20 group-hover:scale-110 transition-all duration-300">
+              <ArrowRightOnRectangleIcon className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <span className="text-sm">Déconnexion</span>
           </button>
         </div>
       </aside>
+
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+          margin: 8px 0;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 10px;
+          border: 2px solid transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      `}</style>
     </>
   )
 }
