@@ -13,18 +13,18 @@ function LoginPage() {
       password: "",
     },
     onSubmit: async ({ value }) => {
-      console.log(value)
+      console.log("LOGIN:", value)
+      // await fetch("/api/auth/login", {...})
     },
   })
 
   return (
     <div className="min-h-screen flex">
       {/* LEFT SIDE */}
-      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#2061D9] to-[#2061D9] items-center justify-center">
+      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#2061D9] to-[#174bb0] items-center justify-center">
         <div className="text-center text-white space-y-6">
           <img src="/logo1.png" alt="Logo" className="mx-auto h-20 w-auto" />
-          {/* <div className="text-4xl font-bold">SOUKLOU</div> */}
-          <h1 className="text-4xl font-extrabold">
+          <h1 className="text-4xl font-extrabold leading-tight">
             Votre plateforme de
             <br />
             <span className="text-white">gestion d'école</span>
@@ -37,65 +37,99 @@ function LoginPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            form.handleSubmit()
+            void form.handleSubmit()
           }}
           className="w-full max-w-md space-y-6 px-8 py-12"
         >
-          {/* Logo top for mobile */}
+          {/* Logo mobile */}
           <div className="lg:hidden text-center mb-6">
             <img src="/logo1.png" alt="Logo" className="mx-auto h-16 w-auto" />
           </div>
 
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Connexion</h2>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-sm mt-1">
               Connectez-vous pour accéder à votre espace
             </p>
           </div>
 
           {/* Email */}
-          <form.Field name="email">
+          <form.Field
+            name="email"
+            validators={{
+              onChange: ({ value }) =>
+                !value
+                  ? "Email requis"
+                  : !value.includes("@")
+                  ? "Email invalide"
+                  : undefined,
+            }}
+          >
             {(field) => (
               <div className="space-y-1">
-                <label className="text-sm font-medium">Adresse email</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Adresse email
+                </label>
                 <input
                   type="email"
                   placeholder="exemple@email.com"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2061D9] focus:border-[#2061D9] transition"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2061D9] focus:border-[#2061D9]"
                 />
+                {field.state.meta.errors?.[0] && (
+                  <p className="text-sm text-red-500">
+                    {field.state.meta.errors[0]}
+                  </p>
+                )}
               </div>
             )}
           </form.Field>
 
           {/* Password */}
-          <form.Field name="password">
+          <form.Field
+            name="password"
+            validators={{
+              onChange: ({ value }) =>
+                !value ? "Mot de passe requis" : undefined,
+            }}
+          >
             {(field) => (
               <div className="space-y-1">
-                <label className="text-sm font-medium">Mot de passe</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Mot de passe
+                </label>
                 <input
                   type="password"
                   placeholder="Votre mot de passe"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2061D9] focus:border-[#2061D9] transition"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2061D9] focus:border-[#2061D9]"
                 />
+                {field.state.meta.errors?.[0] && (
+                  <p className="text-sm text-red-500">
+                    {field.state.meta.errors[0]}
+                  </p>
+                )}
               </div>
             )}
           </form.Field>
 
           <div className="text-right">
-            <Link to="/forgot-password" className="text-sm text-[#2061D9] hover:underline">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-[#2061D9] hover:underline"
+            >
               Mot de passe oublié ?
             </Link>
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 rounded-lg bg-[#2061D9] text-white font-semibold hover:bg-[#174bb0] transition"
+            disabled={form.state.isSubmitting}
+            className="w-full py-3 rounded-lg bg-[#2061D9] text-white font-semibold hover:bg-[#174bb0] transition disabled:opacity-50"
           >
-            Se connecter
+            {form.state.isSubmitting ? "Connexion..." : "Se connecter"}
           </button>
 
           <p className="text-center text-sm text-gray-500">

@@ -30,8 +30,8 @@ export function OnboardingPage() {
         formData.append("logo", logoFile)
       }
 
-      console.log("ONBOARDING FORM DATA", formData)
-      alert("Onboarding envoyé (API à brancher)")
+      console.log("ONBOARDING FORM DATA", Object.fromEntries(formData))
+      // await fetch("/api/onboarding", { method: "POST", body: formData })
     },
   })
 
@@ -43,17 +43,15 @@ export function OnboardingPage() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* LEFT SIDE (desktop) */}
+      {/* LEFT SIDE */}
       <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#2061D9] to-[#174bb0] items-center justify-center">
         <div className="text-center text-white space-y-6 px-8">
           <img src="/logo1.png" alt="Logo" className="mx-auto h-20" />
-
-          <h1 className="text-4xl font-extrabold">
+          <h1 className="text-4xl font-extrabold leading-tight">
             Configurez votre
             <br />
             <span className="text-white">espace scolaire</span>
           </h1>
-
           <p className="text-white/80 max-w-md mx-auto">
             Centralisez la gestion de vos écoles, élèves et équipes en quelques minutes.
           </p>
@@ -65,7 +63,7 @@ export function OnboardingPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            form.handleSubmit()
+            void form.handleSubmit()
           }}
           className="w-full max-w-md space-y-6 px-6 py-12"
         >
@@ -75,16 +73,20 @@ export function OnboardingPage() {
           </div>
 
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Onboarding
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900">Onboarding</h2>
             <p className="text-sm text-gray-500">
               Complétez les informations pour activer votre compte
             </p>
           </div>
 
-          {/* ORGANISATION */}
-          <form.Field name="organizationName">
+          {/* Organisation */}
+          <form.Field
+            name="organizationName"
+            validators={{
+              onChange: ({ value }) =>
+                !value ? "Nom de l’organisation requis" : undefined,
+            }}
+          >
             {(field) => (
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700">
@@ -95,15 +97,23 @@ export function OnboardingPage() {
                   placeholder="Groupe Scolaire La Réussite"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300
-                    focus:outline-none focus:ring-2 focus:ring-[#2061D9]"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:ring-2 focus:ring-[#2061D9]"
                 />
+                {field.state.meta.errors?.[0] && (
+                  <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+                )}
               </div>
             )}
           </form.Field>
 
-          {/* ÉCOLE */}
-          <form.Field name="schoolName">
+          {/* École */}
+          <form.Field
+            name="schoolName"
+            validators={{
+              onChange: ({ value }) =>
+                !value ? "Nom de l’école requis" : undefined,
+            }}
+          >
             {(field) => (
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700">
@@ -114,15 +124,23 @@ export function OnboardingPage() {
                   placeholder="La Réussite – Primaire"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300
-                    focus:outline-none focus:ring-2 focus:ring-[#2061D9]"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:ring-2 focus:ring-[#2061D9]"
                 />
+                {field.state.meta.errors?.[0] && (
+                  <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+                )}
               </div>
             )}
           </form.Field>
 
-          {/* ADRESSE */}
-          <form.Field name="schoolAddress">
+          {/* Adresse */}
+          <form.Field
+            name="schoolAddress"
+            validators={{
+              onChange: ({ value }) =>
+                !value ? "Adresse requise" : undefined,
+            }}
+          >
             {(field) => (
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700">
@@ -133,15 +151,25 @@ export function OnboardingPage() {
                   placeholder="Abidjan"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300
-                    focus:outline-none focus:ring-2 focus:ring-[#2061D9]"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:ring-2 focus:ring-[#2061D9]"
                 />
+                {field.state.meta.errors?.[0] && (
+                  <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+                )}
               </div>
             )}
           </form.Field>
 
-          {/* ANNÉE */}
-          <form.Field name="academicYear">
+          {/* Année scolaire */}
+          <form.Field
+            name="academicYear"
+            validators={{
+              onChange: ({ value }) =>
+                !/^\d{4}-\d{4}$/.test(value)
+                  ? "Format attendu : 2025-2026"
+                  : undefined,
+            }}
+          >
             {(field) => (
               <div className="space-y-1">
                 <label className="text-sm font-medium text-gray-700">
@@ -152,14 +180,16 @@ export function OnboardingPage() {
                   placeholder="2025-2026"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300
-                    focus:outline-none focus:ring-2 focus:ring-[#2061D9]"
+                  className="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-300 focus:ring-2 focus:ring-[#2061D9]"
                 />
+                {field.state.meta.errors?.[0] && (
+                  <p className="text-sm text-red-500">{field.state.meta.errors[0]}</p>
+                )}
               </div>
             )}
           </form.Field>
 
-          {/* LOGO OPTIONNEL */}
+          {/* Logo */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               Logo de l’organisation <span className="text-gray-400">(optionnel)</span>
@@ -168,19 +198,13 @@ export function OnboardingPage() {
             <div className="flex items-center gap-4">
               <div className="w-20 h-20 rounded-lg border bg-gray-100 flex items-center justify-center overflow-hidden">
                 {logoPreview ? (
-                  <img
-                    src={logoPreview}
-                    alt="Preview logo"
-                    className="w-full h-full object-contain"
-                  />
+                  <img src={logoPreview} className="w-full h-full object-contain" />
                 ) : (
-                  <span className="text-xs text-gray-400 text-center">
-                    Aucun logo
-                  </span>
+                  <span className="text-xs text-gray-400 text-center">Aucun logo</span>
                 )}
               </div>
 
-              <label className="cursor-pointer px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-medium transition">
+              <label className="cursor-pointer px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-medium">
                 Choisir une image
                 <input
                   type="file"
@@ -190,18 +214,14 @@ export function OnboardingPage() {
                 />
               </label>
             </div>
-
-            <p className="text-xs text-gray-400">
-              PNG, JPG ou SVG – max 2 Mo
-            </p>
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 rounded-lg bg-[#2061D9] text-white font-semibold
-              hover:bg-[#174bb0] transition"
+            disabled={form.state.isSubmitting}
+            className="w-full py-3 rounded-lg bg-[#2061D9] text-white font-semibold hover:bg-[#174bb0] transition disabled:opacity-50"
           >
-            Valider et continuer
+            {form.state.isSubmitting ? "Création..." : "Valider et continuer"}
           </button>
 
           <p className="text-center text-sm text-gray-500">
