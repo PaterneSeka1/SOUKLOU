@@ -13,6 +13,9 @@ import {
   XMarkIcon,
   PlusIcon,
   ChevronDownIcon,
+  UserGroupIcon,
+  MegaphoneIcon,
+  BellIcon,
 } from "@heroicons/react/24/outline"
 
 export function Sidebar() {
@@ -36,14 +39,29 @@ export function Sidebar() {
 
   const hasMultipleOrgs = user.organizations.length > 1
 
-  // 🔹 Sections alignées avec Actions rapides
+  // 🔹 Sections alignées avec la plateforme de paiement SOUKLOU
   const sections = [
     {
       title: "Tableau de bord",
       links: [{ label: "Dashboard", icon: HomeIcon, to: "/admin/dashboard" }],
     },
     {
-      title: "Gestion scolaire",
+      title: "Paiements",
+      links: [
+        {
+          label: "Transactions",
+          icon: CreditCardIcon,
+          to: "/admin/payments/transactions",
+        },
+        {
+          label: "Plans de paiement",
+          icon: AcademicCapIcon,
+          to: "/admin/payments/plans",
+        },
+      ],
+    },
+    {
+      title: "Gestion des Paiements Scolaire",
       links: [
         {
           label: "Écoles",
@@ -51,25 +69,35 @@ export function Sidebar() {
           to: "/admin/schools",
         },
         {
-          label: "Niveaux",
-          icon: AcademicCapIcon,
-          to: "/admin/grades",
-        },
-        {
-          label: "Étudiants",
+          label: "Élèves",
           icon: ArrowUpTrayIcon,
           to: "/admin/students",
+        },
+        {
+          label: "Parents d'élèves",
+          icon: UserGroupIcon,
+          to: "/admin/parents",
+        },
+      ],
+    },
+    {
+      title: "Communication",
+      links: [
+        {
+          label: "Annonces",
+          icon: MegaphoneIcon,
+          to: "/admin/announcements",
+        },
+        {
+          label: "Notifications",
+          icon: BellIcon,
+          to: "/admin/notifications",
         },
       ],
     },
     {
       title: "Administration",
       links: [
-        {
-          label: "Plans de paiement",
-          icon: CreditCardIcon,
-          to: "/admin/payments/plans",
-        },
         {
           label: "Membres de l'équipe",
           icon: UserPlusIcon,
@@ -86,7 +114,12 @@ export function Sidebar() {
   // 🔹 Animation mobile
   const [menuHeight, setMenuHeight] = useState(0)
   useEffect(() => {
-    if (menuRef.current) setMenuHeight(menuRef.current.scrollHeight)
+    if (menuRef.current) {
+      // Calculer la hauteur disponible (viewport height - navbar height)
+      const viewportHeight = window.innerHeight
+      const navbarHeight = 88 // hauteur de la navbar mobile
+      setMenuHeight(viewportHeight - navbarHeight)
+    }
   }, [isOpen])
 
   // 🔹 Fermer dropdown org au clic extérieur
@@ -138,6 +171,19 @@ export function Sidebar() {
                   </div>
                 </button>
               ))}
+              {/* Bouton d'ajout dans le dropdown */}
+              <button
+                onClick={() => {
+                  console.log("Ajouter une nouvelle organisation")
+                  setOrgDropdownOpen(false)
+                }}
+                className="w-full text-left px-3 py-2.5 bg-gray-50 hover:bg-gray-100 transition-all duration-200 text-xs font-semibold text-[#2061D9] border-t-2 border-gray-200"
+              >
+                <div className="flex items-center gap-2">
+                  <PlusIcon className="w-4 h-4" />
+                  Ajouter une organisation
+                </div>
+              </button>
             </div>
           )}
         </>
@@ -157,12 +203,13 @@ export function Sidebar() {
       {/* 🔹 NAVBAR MOBILE */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white shadow-lg px-6 py-5 flex items-center justify-between border-b-2 border-gray-100">
         <div className="flex items-center gap-3">
+          {/* Logo ou icône dans mobile */}
           <div className="w-12 h-12 rounded-2xl bg-[#2061D9] flex items-center justify-center shadow-lg">
-            <BuildingLibraryIcon className="w-7 h-7 text-white" />
+            <img src="/logo1.png" alt="Logo" className="h-8 w-auto" />
           </div>
           <div>
-            <div className="text-xl font-bold text-gray-900 tracking-tight">EduPanel</div>
-            <div className="text-xs text-gray-500 font-medium">Gestion scolaire</div>
+            <div className="text-lg font-bold text-gray-900 tracking-tight">SOUKLOU</div>
+            <div className="text-xs text-gray-500 font-medium">Gestion des Paiements Scolaire</div>
           </div>
         </div>
         <button
@@ -187,9 +234,9 @@ export function Sidebar() {
         style={{
           maxHeight: isOpen ? `${menuHeight}px` : "0px",
         }}
-        className="lg:hidden fixed top-[88px] left-0 right-0 z-40 bg-white overflow-hidden transition-all duration-300 ease-out shadow-2xl border-b-2 border-gray-200"
+        className="lg:hidden fixed top-[88px] left-0 right-0 bottom-0 z-40 bg-white overflow-y-auto transition-all duration-300 ease-out shadow-2xl border-b-2 border-gray-200"
       >
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 pb-6">
           <OrgButton />
 
           {sections.map((section) => (
@@ -247,13 +294,13 @@ export function Sidebar() {
         <div className="p-5 border-b-2 border-white/10">
           <div className="flex items-center gap-3 mb-5">
             <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm shadow-lg flex items-center justify-center border-2 border-white/20">
-              <BuildingLibraryIcon className="w-6 h-6 text-white" />
+              <img src="/logo4.png" alt="Logo" className="h-6 w-auto" />
             </div>
             <div>
-              <div className="text-lg font-bold text-white tracking-tight">
-                EduPanel
+              <div className="text-lg font-bold text-white tracking-tight">SOUKLOU</div>
+              <div className="text-[10px] text-white/70 font-semibold">
+                Gestion des Paiements Scolaire
               </div>
-              <div className="text-[10px] text-white/70 font-semibold">Gestion scolaire</div>
             </div>
           </div>
           <OrgButton />
