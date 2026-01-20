@@ -24,7 +24,7 @@ export function SchoolsPage() {
 
   return (
     <AdminLayout>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 py-4 border-b border-gray-200">
         <h1 className="text-3xl font-bold">Écoles</h1>
         <button onClick={() => setModalOpen(true)} className="bg-[#2061D9] text-white px-4 py-2 rounded-lg">Ajouter une école</button>
       </div>

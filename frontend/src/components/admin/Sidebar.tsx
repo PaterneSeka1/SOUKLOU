@@ -88,11 +88,6 @@ export function Sidebar() {
           icon: MegaphoneIcon,
           to: "/admin/announcements",
         },
-        {
-          label: "Notifications",
-          icon: BellIcon,
-          to: "/admin/notifications",
-        },
       ],
     },
     {
