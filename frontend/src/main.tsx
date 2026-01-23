@@ -4,6 +4,8 @@ import { RouterProvider, createRouter } from "@tanstack/react-router"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { routeTree } from "./routeTree.gen"
 import "./index.css"
+import 'datatables.net-dt/css/dataTables.dataTables.css'
+
 
 const router = createRouter({ routeTree })
 const queryClient = new QueryClient()

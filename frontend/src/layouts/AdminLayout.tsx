@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react"
+import { ReactNode, useState, useRef, useEffect } from "react"
 import { Sidebar } from "../components/admin/Sidebar"
 import { BellIcon, XMarkIcon } from "@heroicons/react/24/outline"
 
@@ -8,44 +8,51 @@ interface Props {
 
 export function AdminLayout({ children }: Props) {
   const [open, setOpen] = useState(false)
+  const modalRef = useRef<HTMLDivElement>(null)
 
-  // 🔔 Fake notifications (à brancher API plus tard)
+  // Fake notifications
   const notifications = [
-    {
-      id: 1,
-      title: "Paiement reçu",
-      message: "Le parent de Jean Dupont a payé 50 000 FCFA",
-      date: "Il y a 2 min",
-    },
-    {
-      id: 2,
-      title: "Nouvelle inscription",
-      message: "Un élève a été inscrit au Lycée ABC",
-      date: "Il y a 1 heure",
-    },
+    { id: 1, title: "Paiement reçu", message: "Le parent de Jean Dupont a payé 50 000 FCFA", date: "Il y a 2 min" },
+    { id: 2, title: "Nouvelle inscription", message: "Un élève a été inscrit au Lycée ABC", date: "Il y a 1 heure" },
   ]
+
+  // 🔹 Fermer modal si clic en dehors
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside)
+    }
+
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [open])
 
   return (
     <div className="min-h-screen bg-gray-100">
       <Sidebar />
 
       {/* MAIN CONTENT */}
-      <main className="lg:ml-64 pt-[88px] lg:pt-0 p-6">
-        {children}
-      </main>
+      <main className="lg:ml-64 pt-[88px] lg:pt-5 p-6">{children}</main>
 
-      {/* 🔔 FLOATING NOTIFICATION BUTTON */}
+      {/* FLOATING NOTIFICATION BUTTON */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#2061D9] text-white flex items-center justify-center shadow-2xl hover:bg-[#174bb0] transition-all hover:scale-110"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-souklou-primary-600 text-white flex items-center justify-center shadow-2xl hover:bg-souklou-primary-700 transition-all hover:scale-110"
       >
         <BellIcon className="w-6 h-6" />
       </button>
 
-      {/* 🔔 MODAL NOTIFICATIONS */}
+      {/* MODAL NOTIFICATIONS */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-end lg:items-center justify-center bg-black/50">
-          <div className="bg-white w-full lg:max-w-md rounded-t-3xl lg:rounded-2xl shadow-2xl p-6 animate-in slide-in-from-bottom lg:slide-in-from-top">
+          <div
+            ref={modalRef}
+            className="bg-white w-full lg:max-w-md rounded-t-3xl lg:rounded-2xl shadow-2xl p-6 animate-in slide-in-from-bottom lg:slide-in-from-top"
+          >
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold">Notifications</h2>
@@ -60,9 +67,7 @@ export function AdminLayout({ children }: Props) {
             {/* List */}
             <div className="space-y-4 max-h-[60vh] overflow-y-auto">
               {notifications.length === 0 ? (
-                <p className="text-sm text-gray-500 text-center">
-                  Aucune notification
-                </p>
+                <p className="text-sm text-gray-500 text-center">Aucune notification</p>
               ) : (
                 notifications.map((n) => (
                   <div
